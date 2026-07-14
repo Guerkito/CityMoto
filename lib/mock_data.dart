@@ -52,10 +52,46 @@ class PromotionMock {
   });
 }
 
+class PublicidadMock {
+  final String id;
+  final String title;
+  final String client;
+  final String status; // "Activa" o "Pausada"
+  final int impressions;
+  final int clicks;
+  final String zone;
+
+  PublicidadMock({
+    required this.id,
+    required this.title,
+    required this.client,
+    required this.status,
+    required this.impressions,
+    required this.clicks,
+    required this.zone,
+  });
+}
+
+class ViajeConductorMock {
+  final String date;
+  final String passengerName;
+  final String route;
+  final String fare;
+  final String status;
+
+  ViajeConductorMock({
+    required this.date,
+    required this.passengerName,
+    required this.route,
+    required this.fare,
+    required this.status,
+  });
+}
+
 class SosAlertMock {
   final String id;
   final String userName;
-  final String userType;
+  final String userType; // "Pasajero" o "Conductor"
   final String location;
   final String time;
   String status; // "Activa" o "Atendida"
@@ -136,7 +172,8 @@ class MockData {
     ),
   ];
 
-  static final List<PromotionMock> promotions = [
+  // Promociones iniciales estáticas
+  static final List<PromotionMock> _initialPromotions = [
     PromotionMock(
       title: 'Bono de Fin de Semana',
       condition: 'Realiza 3 viajes entre viernes y domingo',
@@ -157,7 +194,70 @@ class MockData {
     ),
   ];
 
-  static final List<SosAlertMock> initialSosAlerts = [
+  // Campañas de publicidad iniciales
+  static final List<PublicidadMock> _initialPublicidad = [
+    PublicidadMock(
+      id: 'PUB-001',
+      title: 'Festival Fusagasugá 2026',
+      client: 'Alcaldía de Fusagasugá',
+      status: 'Activa',
+      impressions: 12450,
+      clicks: 840,
+      zone: 'Fusa Centro',
+    ),
+    PublicidadMock(
+      id: 'PUB-002',
+      title: 'Descuento Gasolinera Biomax',
+      client: 'Biomax Estaciones',
+      status: 'Activa',
+      impressions: 8900,
+      clicks: 650,
+      zone: 'Fusa Entrada',
+    ),
+    PublicidadMock(
+      id: 'PUB-003',
+      title: 'Llantera Fusa Express',
+      client: 'Llantas Fusa S.A.S.',
+      status: 'Pausada',
+      impressions: 4300,
+      clicks: 120,
+      zone: 'Vía Melgar',
+    ),
+  ];
+
+  // Historial de viajes del Conductor
+  static final List<ViajeConductorMock> viajesConductor = [
+    ViajeConductorMock(
+      date: 'Hoy, 12:40 PM',
+      passengerName: 'Laura Gómez',
+      route: 'Fusa Centro -> CC Manila',
+      fare: '\$8.500 COP',
+      status: 'Completado',
+    ),
+    ViajeConductorMock(
+      date: 'Hoy, 10:15 AM',
+      passengerName: 'Carlos Mendoza',
+      route: 'Terminal de Fusa -> Barrio Balmoral',
+      fare: '\$9.000 COP',
+      status: 'Completado',
+    ),
+    ViajeConductorMock(
+      date: 'Ayer, 5:30 PM',
+      passengerName: 'Andrea Rojas',
+      route: 'Calle 11 # 8-45 -> Universidad de Cundinamarca',
+      fare: '\$7.500 COP',
+      status: 'Completado',
+    ),
+    ViajeConductorMock(
+      date: 'Ayer, 2:10 PM',
+      passengerName: 'Luis Hernando',
+      route: 'Barrio Pekín -> Fusa Centro',
+      fare: '\$8.000 COP',
+      status: 'Completado',
+    ),
+  ];
+
+  static final List<SosAlertMock> _initialSosAlerts = [
     SosAlertMock(
       id: 'SOS-104',
       userName: 'Laura Gómez',
@@ -184,9 +284,11 @@ class MockData {
     ),
   ];
 
-  // Estado global mutable en memoria para simular interactividad del panel admin y la app
-  static List<SosAlertMock> sosAlerts = List.from(initialSosAlerts);
-  static int activeDriverIndex = 0; // Andrés M. por defecto
+  // Listas mutables en memoria para interactividad en tiempo real
+  static List<SosAlertMock> sosAlerts = List.from(_initialSosAlerts);
+  static List<PromotionMock> promotions = List.from(_initialPromotions);
+  static List<PublicidadMock> publicidadList = List.from(_initialPublicidad);
+  static int activeDriverIndex = 0; // Andrés M.
   
   static void addSosAlert(String name, String type, String loc) {
     final nextId = 'SOS-${100 + sosAlerts.length + 1}';
@@ -197,6 +299,28 @@ class MockData {
       location: loc,
       time: 'Hace un momento',
       status: 'Activa',
+    ));
+  }
+
+  static void addPromotion(String title, String condition, String benefit) {
+    promotions.insert(0, PromotionMock(
+      title: title,
+      condition: condition,
+      benefit: benefit,
+      icon: Icons.card_giftcard,
+    ));
+  }
+
+  static void addPublicidad(String title, String client, String zone) {
+    final nextId = 'PUB-00${publicidadList.length + 1}';
+    publicidadList.insert(0, PublicidadMock(
+      id: nextId,
+      title: title,
+      client: client,
+      status: 'Activa',
+      impressions: 0,
+      clicks: 0,
+      zone: zone,
     ));
   }
 }

@@ -159,9 +159,18 @@ class ConductorEnCursoPage extends StatelessWidget {
                     ),
                     // Mensaje de WhatsApp
                     IconButton(
-                      icon: const Icon(Icons.message, color: Color(0xFF8CFF00), size: 22),
+                      icon: const Icon(Icons.message, color: Color(0xFF8CFF00), size: 20),
                       onPressed: () {
                         _simularAccion(context, 'Abrir WhatsApp', 'Abriendo chat de WhatsApp con la pasajera Laura Gómez...');
+                      },
+                    ),
+                    const SizedBox(width: 4),
+                    // SOS Conductor
+                    IconButton(
+                      icon: const Icon(Icons.warning, color: Color(0xFFFF3B30), size: 20),
+                      onPressed: () {
+                        MockData.addSosAlert('Andrés M. (Conductor)', 'Conductor', 'En ruta (Vía Silvania - CC Manila)');
+                        _simularAccion(context, 'SOS Activado', 'Tu alerta SOS en ruta ha sido enviada al centro de control. Mantén la calma, la ayuda está en camino.');
                       },
                     ),
                   ],

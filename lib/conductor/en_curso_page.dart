@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/custom_map.dart';
 import '../mock_data.dart';
 
 class ConductorEnCursoPage extends StatelessWidget {
@@ -11,192 +10,253 @@ class ConductorEnCursoPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
-      body: Stack(
-        children: [
-          // Mapa con ruta trazada en púrpura neón
-          const Positioned.fill(
-            child: CustomMap(
-              showRoute: true,
-              routeColor: Color(0xFFA855F7),
-            ),
-          ),
-          
-          // Indicador de estado superior
-          Positioned(
-            top: 54,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141414).withOpacity(0.9),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF222222), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 10,
-                  ),
-                ],
+      appBar: AppBar(
+        title: const Text(
+          'Servicio en curso (Conductor)',
+          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+        ),
+        backgroundColor: const Color(0xFF0A0A0A),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Banner superior neón
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8CFF00).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF8CFF00).withOpacity(0.4), width: 1.5),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.navigation, color: Color(0xFF8CFF00), size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Navegando al destino del pasajero',
+                            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Destino a 1.2 km (aprox. 5 min)',
+                            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontFamily: 'Inter'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: const Row(
+              const SizedBox(height: 28),
+
+              // RUTA TEXTUAL EN DETALLE (Timeline)
+              const Text(
+                'Hoja de Ruta',
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              ),
+              const SizedBox(height: 16),
+              
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF222222)),
+                ),
+                child: Column(
+                  children: [
+                    // Origen
+                    _buildRouteNode(
+                      icon: Icons.my_location,
+                      iconColor: const Color(0xFF8CFF00),
+                      title: 'Dirección de Recogida (Pasajero)',
+                      address: 'Calle 8 # 12-45, Fusagasugá Centro',
+                    ),
+                    
+                    // Línea conectora
+                    Row(
+                      children: [
+                        const SizedBox(width: 9),
+                        Container(
+                          width: 2,
+                          height: 32,
+                          color: const Color(0xFF222222),
+                        ),
+                      ],
+                    ),
+                    
+                    // Destino
+                    _buildRouteNode(
+                      icon: Icons.location_on,
+                      iconColor: const Color(0xFFA855F7),
+                      title: 'Dirección de Destino (Pasajero)',
+                      address: 'Centro Comercial Manila, Fusagasugá',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Datos del Pasajero
+              const Text(
+                'Información del Pasajero',
+                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              ),
+              const SizedBox(height: 12),
+
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF222222)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF222222),
+                        border: Border.all(color: const Color(0xFF8CFF00), width: 1.5),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            profile['name'] as String,
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 2),
+                          const Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.amber, size: 12),
+                              SizedBox(width: 4),
+                              Text(
+                                '4.9 · Pasajero VIP',
+                                style: TextStyle(color: Colors.white54, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Mensaje de WhatsApp
+                    IconButton(
+                      icon: const Icon(Icons.message, color: Color(0xFF8CFF00), size: 22),
+                      onPressed: () {
+                        _simularAccion(context, 'Abrir WhatsApp', 'Abriendo chat de WhatsApp con la pasajera Laura Gómez...');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              
+              const Spacer(),
+
+              // Botones Cancelar / Finalizar
+              Row(
                 children: [
-                  Icon(Icons.navigation, color: Color(0xFF8CFF00), size: 18),
-                  SizedBox(width: 12),
+                  // Cancelar
                   Expanded(
-                    child: Text(
-                      'Navegando al destino del pasajero',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
+                    child: SizedBox(
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          _simularAccion(context, 'Cancelar Servicio', '¿Seguro que deseas cancelar este servicio? El sistema te penalizará temporalmente.');
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFFF3B30), width: 1.5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(color: Color(0xFFFF3B30), fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  
+                  // Finalizar
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('¡Servicio finalizado con éxito!', style: TextStyle(color: Colors.black)),
+                              backgroundColor: Color(0xFF8CFF00),
+                            ),
+                          );
+                          Navigator.pushReplacementNamed(context, '/conductor');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8CFF00),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text(
+                          'Finalizar',
+                          style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 12),
+            ],
           ),
-          
-          // Tarjeta inferior de Viaje Activo
-          Positioned(
-            bottom: 24,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141414),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFF222222), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Datos del Pasajero
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFF222222),
-                          border: Border.all(color: const Color(0xFF8CFF00), width: 1.5),
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.person, color: Colors.white, size: 24),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile['name'] as String,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Row(
-                              children: [
-                                Icon(Icons.star, color: Colors.amber, size: 12),
-                                SizedBox(width: 4),
-                                Text(
-                                  '4.9 · Pasajero VIP',
-                                  style: TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 11,
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Chat de WhatsApp simulado
-                      IconButton(
-                        icon: const Icon(Icons.message, color: Color(0xFF8CFF00), size: 22),
-                        onPressed: () {
-                          _simularAccion(context, 'Abrir WhatsApp', 'Abriendo chat de WhatsApp con la pasajera Laura Gómez...');
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Fila de botones de control
-                  Row(
-                    children: [
-                      // Cancelar
-                      Expanded(
-                        child: SizedBox(
-                          height: 52,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              _simularAccion(context, 'Cancelar Servicio', '¿Seguro que deseas cancelar este servicio? El sistema te penalizará temporalmente.');
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFFF3B30), width: 1.5),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
-                            child: const Text(
-                              'Cancelar',
-                              style: TextStyle(color: Color(0xFFFF3B30), fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      
-                      // Finalizar Viaje
-                      Expanded(
-                        child: SizedBox(
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('¡Servicio finalizado con éxito!', style: TextStyle(color: Colors.black)),
-                                  backgroundColor: Color(0xFF8CFF00),
-                                ),
-                              );
-                              // Vuelve al home del conductor
-                              Navigator.pushReplacementNamed(context, '/conductor');
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF8CFF00),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
-                            child: const Text(
-                              'Finalizar',
-                              style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildRouteNode({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String address,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: iconColor, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontFamily: 'Inter'),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                address,
+                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

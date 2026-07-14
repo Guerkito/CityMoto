@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../widgets/browser_frame.dart';
-import '../widgets/custom_map.dart';
 import '../mock_data.dart';
 
 class AdminContainer extends StatefulWidget {
@@ -350,134 +349,104 @@ class _AdminContainerState extends State<AdminContainer> {
   }
 
   // --- VISTA 2: CONDUCTORES EN TIEMPO REAL ---
-
-  DriverMock? _selectedDriverOnMap;
   
   Widget _buildConductoresView(Size size) {
-    // Definimos marcadores estáticos de motos en la pantalla
-    final List<MapMarker> markers = [
-      MapMarker(id: 'd1', label: 'Andrés M.', position: const Offset(150, 200), icon: Icons.two_wheeler, color: const Color(0xFF8CFF00)),
-      MapMarker(id: 'd2', label: 'Carlos R.', position: const Offset(340, 150), icon: Icons.two_wheeler, color: Colors.cyanAccent),
-      MapMarker(id: 'd3', label: 'Mateo S.', position: const Offset(450, 380), icon: Icons.two_wheeler, color: const Color(0xFFA855F7)),
-      MapMarker(id: 'd4', label: 'Santiago G.', position: const Offset(200, 480), icon: Icons.two_wheeler, color: Colors.amberAccent),
+    final List<DriverMock> allDrivers = [
+      MockData.drivers[0],
+      MockData.drivers[1],
+      MockData.drivers[2],
+      DriverMock(
+        id: 'd4',
+        name: 'Santiago G.',
+        rating: 4.6,
+        vehicle: 'KTM Duke 200',
+        licensePlate: 'EDC89A',
+        eta: '8 min',
+        phone: '+57 320 000 0000',
+        avatarUrl: '',
+      ),
     ];
 
-    return Stack(
-      children: [
-        // Mapa simulado ocupando la pantalla
-        Positioned.fill(
-          child: CustomMap(
-            staticMarkers: markers,
-            onMarkerTap: (marker) {
-              setState(() {
-                if (marker.id == 'd1') _selectedDriverOnMap = MockData.drivers[0];
-                if (marker.id == 'd2') _selectedDriverOnMap = MockData.drivers[1];
-                if (marker.id == 'd3') _selectedDriverOnMap = MockData.drivers[2];
-                if (marker.id == 'd4') {
-                  _selectedDriverOnMap = DriverMock(
-                    id: 'd4',
-                    name: 'Santiago G.',
-                    rating: 4.6,
-                    vehicle: 'KTM Duke 200',
-                    licensePlate: 'EDC89A',
-                    eta: '8 min',
-                    phone: '+57 320 000 0000',
-                    avatarUrl: '',
-                  );
-                }
-              });
-            },
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Monitoreo de Conductores Activos',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
           ),
-        ),
-        
-        // Cabecera del mapa
-        Positioned(
-          top: 24,
-          left: 24,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF141414).withOpacity(0.9),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF222222)),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.directions_bike, color: Color(0xFF8CFF00), size: 18),
-                SizedBox(width: 8),
-                Text(
-                  'Monitoreo de Conductores Activos (Hacer Click en Moto)',
-                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+          const SizedBox(height: 12),
+          const Text(
+            'Listado en tiempo real de choferes conectados y su estado de servicio (100% texto).',
+            style: TextStyle(color: Colors.white54, fontSize: 13, fontFamily: 'Inter'),
           ),
-        ),
-        
-        // Tarjeta flotante de conductor seleccionado
-        if (_selectedDriverOnMap != null)
-          Positioned(
-            bottom: 24,
-            right: 24,
-            width: 280,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141414),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF8CFF00).withOpacity(0.5), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
-                    blurRadius: 15,
+          const SizedBox(height: 24),
+          
+          Expanded(
+            child: ListView.builder(
+              itemCount: allDrivers.length,
+              itemBuilder: (context, index) {
+                final d = allDrivers[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF141414),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF222222)),
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Row(
                     children: [
-                      Text(
-                        _selectedDriverOnMap!.name,
-                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFF222222),
+                          border: Border.all(color: const Color(0xFF8CFF00), width: 1.5),
+                        ),
+                        child: const Icon(Icons.two_wheeler, color: Color(0xFF8CFF00)),
                       ),
-                      IconButton(
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.close, color: Colors.white54, size: 16),
-                        onPressed: () {
-                          setState(() {
-                            _selectedDriverOnMap = null;
-                          });
-                        },
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(d.name, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Text('${d.vehicle} · Placa: ${d.licensePlate}', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.star, color: Colors.amber, size: 14),
+                              const SizedBox(width: 4),
+                              Text('${d.rating}', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF8CFF00).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: const Color(0xFF8CFF00).withOpacity(0.3)),
+                            ),
+                            child: const Text('Activo · Libre', style: TextStyle(color: Color(0xFF8CFF00), fontSize: 10, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  _buildDriverCardRow('Vehículo:', _selectedDriverOnMap!.vehicle),
-                  _buildDriverCardRow('Placa:', _selectedDriverOnMap!.licensePlate),
-                  _buildDriverCardRow('Calificación:', '${_selectedDriverOnMap!.rating} ★'),
-                  _buildDriverCardRow('Velocidad Promedio:', '42 km/h'),
-                  _buildDriverCardRow('Estado:', 'En Servicio', color: const Color(0xFF8CFF00)),
-                ],
-              ),
+                );
+              },
             ),
           ),
-      ],
-    );
-  }
-
-  Widget _buildDriverCardRow(String label, String value, {Color? color}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-          Text(value, style: TextStyle(color: color ?? Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -622,46 +591,37 @@ class _AdminContainerState extends State<AdminContainer> {
                                 const Icon(Icons.warning, color: Color(0xFFFF3B30), size: 18),
                             ],
                           ),
-                          const SizedBox(height: 20),
-                          
-                          // Mapa detallado con pin rojo pulsante
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFF222222)),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(11),
-                                child: Stack(
-                                  children: [
-                                    const Positioned.fill(
-                                      child: CustomMap(
-                                        showRoute: false,
+                          // Tarjeta de estado de Emergencia Textual Grande
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF3B30).withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFFFF3B30).withOpacity(0.3), width: 1),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.gpp_bad, color: Color(0xFFFF3B30), size: 40),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'EMERGENCIA REPORTADA',
+                                        style: TextStyle(color: Color(0xFFFF3B30), fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                                       ),
-                                    ),
-                                    // Pin rojo de SOS simulado
-                                    Center(
-                                      child: Container(
-                                        width: 20,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: const Color(0xFFFF3B30),
-                                          border: Border.all(color: Colors.white, width: 2),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(0xFFFF3B30).withOpacity(0.5),
-                                              blurRadius: 15,
-                                              spreadRadius: 3,
-                                            ),
-                                          ],
-                                        ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        _selectedSosAlert!.status == 'Activa' 
+                                            ? 'Alerta activa en tiempo real. Se requiere contactar soporte y autoridades.' 
+                                            : 'Alerta ya fue atendida por el operador.',
+                                        style: const TextStyle(color: Colors.white70, fontSize: 11),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 20),

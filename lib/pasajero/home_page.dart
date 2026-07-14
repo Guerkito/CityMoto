@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/custom_map.dart';
 import '../widgets/bottom_nav.dart';
 import 'perfil_page.dart';
 
@@ -51,25 +50,27 @@ class PasajeroHomePage extends StatefulWidget {
 }
 
 class _PasajeroHomePageState extends State<PasajeroHomePage> {
+  final TextEditingController _origenController = TextEditingController(text: 'Calle 8 # 12-45, Fusagasugá Centro');
   final TextEditingController _destinoController = TextEditingController(text: 'CC Manila, Fusa');
   bool _isForMe = true;
   bool _isOutsideFusa = false;
 
   @override
   void dispose() {
+    _origenController.dispose();
     _destinoController.dispose();
     super.dispose();
   }
 
   void _buildGpsTrackingAndNavigate() {
-    // Simula una búsqueda precisa de GPS satelital con un modal de carga cyberpunk premium
+    // Simula la calibración de GPS exacta
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return _GpsLockingDialog(
           onFinished: () {
-            Navigator.pop(context); // Cierra diálogo
+            Navigator.pop(context);
             Navigator.pushNamed(context, '/pasajero/tipo');
           },
         );
@@ -79,305 +80,310 @@ class _PasajeroHomePageState extends State<PasajeroHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Mapa simulado de fondo
-        const Positioned.fill(
-          child: CustomMap(),
-        ),
-        
-        // Degradado superior para legibilidad
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 120,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.black.withOpacity(0.8),
-                  Colors.black.withOpacity(0.0),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-        ),
-
-        // Barra superior con LOGO
-        Positioned(
-          top: 44,
-          left: 20,
-          right: 20,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logotipo de la carpeta de assets
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/logos/logo3.jpeg',
-                  height: 38,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Fallback a texto en caso de que falle la carga de la imagen
-                    return RichText(
-                      text: const TextSpan(
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Inter',
-                        ),
-                        children: [
-                          TextSpan(text: 'City', style: TextStyle(color: Colors.white)),
-                          TextSpan(
-                            text: 'MOTO',
-                            style: TextStyle(
-                              color: Color(0xFF8CFF00),
-                              shadows: [
-                                Shadow(color: Color(0xFF8CFF00), blurRadius: 8),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              
-              // Notificaciones
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF222222), width: 1),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.notifications_none, color: Colors.white, size: 20),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('No tienes notificaciones nuevas.'),
-                        backgroundColor: Color(0xFF141414),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Accesos directos flotantes rápidos (CITY Regalos / SOS)
-        Positioned(
-          bottom: 385,
-          left: 20,
-          right: 20,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildFloatingActionButton(
-                label: 'CITY Regalos',
-                icon: Icons.card_giftcard,
-                iconColor: const Color(0xFF8CFF00),
-                onTap: () {
-                  Navigator.pushNamed(context, '/pasajero/regalos');
-                },
-              ),
-              _buildFloatingActionButton(
-                label: 'SOS Emergencia',
-                icon: Icons.warning_amber_rounded,
-                iconColor: const Color(0xFFFF3B30),
-                isSos: true,
-                onTap: () {
-                  Navigator.pushNamed(context, '/pasajero/sos');
-                },
-              ),
-            ],
-          ),
-        ),
-
-        // Tarjeta inferior de Solicitud de Servicio (Expandida con campos requeridos)
-        Positioned(
-          bottom: 24,
-          left: 20,
-          right: 20,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFF141414),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF222222), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Fila 1: Origen (GPS)
-                Row(
-                  children: [
-                    const Icon(Icons.my_location, color: Color(0xFF8CFF00), size: 16),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Origen actual (GPS fijado)',
-                            style: TextStyle(color: Colors.white54, fontSize: 10, fontFamily: 'Inter'),
-                          ),
-                          Text(
-                            _isOutsideFusa ? 'Vía Silvania (Fuera de Fusa)' : 'Calle 8 # 12-45, Fusagasugá Centro',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                
-                // Fila 2: Destino (TextField Interactivo)
-                TextField(
-                  controller: _destinoController,
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Inter'),
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.location_on, color: Color(0xFFA855F7), size: 18),
-                    hintText: '¿A dónde vas?',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
-                    filled: true,
-                    fillColor: const Color(0xFF0A0A0A),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF222222)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF222222)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF8CFF00)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Direcciones favoritas rápidas
-                Row(
-                  children: [
-                    _buildFavAddressBtn('🏠 Casa (Fusa)', 'Calle 6 # 14-22, Fusa Centro'),
-                    const SizedBox(width: 8),
-                    _buildFavAddressBtn('💼 Trabajo', 'Avenida Las Palmas # 20-30'),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Fila 3: Toggle ¿Para quién es el viaje?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '¿Para quién es el servicio?',
-                      style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Inter'),
-                    ),
-                    Row(
-                      children: [
-                        _buildForWhoBtn('Para mí', _isForMe, () => setState(() => _isForMe = true)),
-                        const SizedBox(width: 8),
-                        _buildForWhoBtn('Para otro', !_isForMe, () => setState(() => _isForMe = false)),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
-                // Fila 4: Switch ¿Fuera de Fusa?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '¿Estoy fuera de Fusagasugá?',
-                      style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Inter'),
-                    ),
-                    Switch(
-                      value: _isOutsideFusa,
-                      onChanged: (val) {
-                        setState(() {
-                          _isOutsideFusa = val;
-                        });
-                      },
-                      activeColor: const Color(0xFF8CFF00),
-                      activeTrackColor: const Color(0xFF8CFF00).withOpacity(0.3),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                
-                // Botón Pedir Servicio
-                Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF8CFF00), Color(0xFF76D600)],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF8CFF00).withOpacity(0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: _buildGpsTrackingAndNavigate,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Pedir servicio',
+              // Barra superior con Logo
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/logos/logo3.jpeg',
+                      height: 38,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => RichText(
+                        text: const TextSpan(
                           style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Inter',
                           ),
+                          children: [
+                            TextSpan(text: 'City', style: TextStyle(color: Colors.white)),
+                            TextSpan(text: 'MOTO', style: TextStyle(color: Color(0xFF8CFF00))),
+                          ],
                         ),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, color: Colors.black, size: 18),
-                      ],
+                      ),
                     ),
                   ),
+                  
+                  // Notificaciones
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF141414),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF222222), width: 1),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No tienes notificaciones nuevas.'),
+                            backgroundColor: Color(0xFF141414),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Cabecera interactiva
+              const Text(
+                '¿A dónde vamos hoy?',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Ingresa tu ubicación actual y tu destino para solicitar un conductor cercano.',
+                style: TextStyle(
+                  color: Colors.white60,
+                  fontSize: 13,
+                  fontFamily: 'Inter',
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Formulario Principal de Solicitud (Ubicaciones)
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFF222222), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 15,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Campo Origen (¿Dónde estás?)
+                    const Text(
+                      '¿Dónde te recogemos?',
+                      style: TextStyle(color: Color(0xFF8CFF00), fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _origenController,
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Inter'),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.my_location, color: Color(0xFF8CFF00), size: 18),
+                        hintText: 'Escribe tu ubicación actual...',
+                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+                        filled: true,
+                        fillColor: const Color(0xFF0A0A0A),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF222222)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF222222)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF8CFF00)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Campo Destino (¿A dónde vas?)
+                    const Text(
+                      '¿Cuál es tu destino?',
+                      style: TextStyle(color: Color(0xFFA855F7), fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _destinoController,
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Inter'),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.location_on, color: Color(0xFFA855F7), size: 18),
+                        hintText: 'Escribe tu destino...',
+                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+                        filled: true,
+                        fillColor: const Color(0xFF0A0A0A),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF222222)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF222222)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF8CFF00)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Direcciones Rápidas Favoritas
+                    Row(
+                      children: [
+                        _buildFavAddressBtn('🏠 Casa (Fusa)', 'Calle 6 # 14-22, Fusa Centro'),
+                        const SizedBox(width: 8),
+                        _buildFavAddressBtn('💼 Trabajo', 'Avenida Las Palmas # 20-30'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Tarjeta Opciones Adicionales de Viaje
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF222222)),
+                ),
+                child: Column(
+                  children: [
+                    // Opción: ¿Para quién es?
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '¿Para quién es el servicio?',
+                          style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Inter'),
+                        ),
+                        Row(
+                          children: [
+                            _buildForWhoBtn('Para mí', _isForMe, () => setState(() => _isForMe = true)),
+                            const SizedBox(width: 8),
+                            _buildForWhoBtn('Para otro', !_isForMe, () => setState(() => _isForMe = false)),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const Divider(color: Color(0xFF222222), height: 24),
+
+                    // Opción: ¿Fuera de Fusa?
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '¿Estoy fuera de Fusagasugá?',
+                          style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Inter'),
+                        ),
+                        Switch(
+                          value: _isOutsideFusa,
+                          onChanged: (val) {
+                            setState(() {
+                              _isOutsideFusa = val;
+                              if (_isOutsideFusa) {
+                                _origenController.text = 'Vía Silvania (Fuera de Fusa)';
+                              } else {
+                                _origenController.text = 'Calle 8 # 12-45, Fusagasugá Centro';
+                              }
+                            });
+                          },
+                          activeColor: const Color(0xFF8CFF00),
+                          activeTrackColor: const Color(0xFF8CFF00).withOpacity(0.3),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Botón Principal Pedir Servicio
+              Container(
+                height: 56,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF8CFF00), Color(0xFF76D600)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8CFF00).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: _buildGpsTrackingAndNavigate,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Pedir servicio ahora',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, color: Colors.black, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Botones Flotantes de atajo flotando sobre el contenido
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildFloatingActionButton(
+                    label: 'CITY Regalos',
+                    icon: Icons.card_giftcard,
+                    iconColor: const Color(0xFF8CFF00),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/pasajero/regalos');
+                    },
+                  ),
+                  _buildFloatingActionButton(
+                    label: 'SOS Emergencia',
+                    icon: Icons.warning_amber_rounded,
+                    iconColor: const Color(0xFFFF3B30),
+                    isSos: true,
+                    onTap: () {
+                      Navigator.pushNamed(context, '/pasajero/sos');
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -410,7 +416,7 @@ class _PasajeroHomePageState extends State<PasajeroHomePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF8CFF00).withOpacity(0.15) : const Color(0xFF0A0A0A),
           borderRadius: BorderRadius.circular(8),
@@ -422,7 +428,7 @@ class _PasajeroHomePageState extends State<PasajeroHomePage> {
           label,
           style: TextStyle(
             color: isSelected ? const Color(0xFF8CFF00) : Colors.white60,
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: FontWeight.bold,
             fontFamily: 'Inter',
           ),
@@ -534,7 +540,6 @@ class _GpsLockingDialogState extends State<_GpsLockingDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Spinner de carga neón
             Stack(
               alignment: Alignment.center,
               children: [
@@ -558,8 +563,6 @@ class _GpsLockingDialogState extends State<_GpsLockingDialog> {
               ],
             ),
             const SizedBox(height: 24),
-            
-            // Textos
             Text(
               _statusText,
               style: const TextStyle(

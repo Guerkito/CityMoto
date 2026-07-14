@@ -174,13 +174,37 @@ class RegalosPage extends StatelessWidget {
                 itemCount: MockData.promotions.length,
                 itemBuilder: (context, index) {
                   final promo = MockData.promotions[index];
+                  
+                  // Analizar meta de viajes dinámicamente de la condición
+                  int targetPromoRides = 3;
+                  if (promo.condition.contains('3')) {
+                    targetPromoRides = 3;
+                  } else if (promo.condition.contains('5')) {
+                    targetPromoRides = 5;
+                  } else if (promo.condition.contains('8')) {
+                    targetPromoRides = 8;
+                  } else if (promo.condition.toLowerCase().contains('primer') || promo.condition.toLowerCase().contains('invita')) {
+                    targetPromoRides = 1;
+                  }
+
+                  int currentPromoRides = completed;
+                  if (currentPromoRides > targetPromoRides) {
+                    currentPromoRides = targetPromoRides;
+                  }
+
+                  final double promoProgress = currentPromoRides / targetPromoRides;
+                  final bool isCompleted = currentPromoRides >= targetPromoRides;
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: const Color(0xFF141414),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFF222222), width: 1),
+                      border: Border.all(
+                        color: isCompleted ? const Color(0xFF8CFF00).withOpacity(0.3) : const Color(0xFF222222),
+                        width: isCompleted ? 1.5 : 1.0,
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,10 +212,14 @@ class RegalosPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
+                            color: isCompleted ? const Color(0xFF8CFF00).withOpacity(0.1) : Colors.white.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(promo.icon, color: Colors.cyanAccent, size: 20),
+                          child: Icon(
+                            promo.icon,
+                            color: isCompleted ? const Color(0xFF8CFF00) : Colors.cyanAccent,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -216,11 +244,61 @@ class RegalosPage extends StatelessWidget {
                                   fontFamily: 'Inter',
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 12),
+                              
+                              // Indicador de Progreso
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    isCompleted ? '¡Completada!' : 'Progreso: $currentPromoRides de $targetPromoRides viajes',
+                                    style: TextStyle(
+                                      color: isCompleted ? const Color(0xFF8CFF00) : Colors.white70,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Inter',
+                                    ),
+                                  ),
+                                  Text(
+                                    isCompleted ? 'Listo para reclamar' : '${(promoProgress * 100).toInt()}%',
+                                    style: TextStyle(
+                                      color: isCompleted ? const Color(0xFF8CFF00) : Colors.white54,
+                                      fontSize: 10,
+                                      fontFamily: 'Inter',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              
+                              // Barra de Progreso Local
+                              Stack(
+                                children: [
+                                  Container(
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF222222),
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                  ),
+                                  FractionallySizedBox(
+                                    widthFactor: promoProgress,
+                                    child: Container(
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: isCompleted ? const Color(0xFF8CFF00) : Colors.cyanAccent,
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              
+                              const SizedBox(height: 12),
                               Text(
                                 promo.benefit,
-                                style: const TextStyle(
-                                  color: Colors.cyanAccent,
+                                style: TextStyle(
+                                  color: isCompleted ? const Color(0xFF8CFF00) : Colors.cyanAccent,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Inter',

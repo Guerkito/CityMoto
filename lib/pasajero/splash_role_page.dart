@@ -167,7 +167,7 @@ class _SplashRolePageState extends State<SplashRolePage> {
               _buildRoleCard(
                 title: 'Soy Pasajero',
                 subtitle: 'Quiero viajar rápido y seguro en la ciudad',
-                icon: Icons.personal_video, // Reemplazo de casco con icono elegante
+                icon: Icons.person, // Icono de una persona
                 iconData: Icons.shield, // Icono secundario
                 accentColor: const Color(0xFF8CFF00), // Verde neón
                 onTap: () {

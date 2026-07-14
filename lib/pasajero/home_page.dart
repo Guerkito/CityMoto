@@ -19,7 +19,6 @@ class _PasajeroContainerState extends State<PasajeroContainer> {
       backgroundColor: const Color(0xFF0A0A0A),
       body: Stack(
         children: [
-          // Pantalla activa basada en el índice de navegación inferior
           Positioned.fill(
             child: IndexedStack(
               index: _currentIndex,
@@ -44,8 +43,39 @@ class _PasajeroContainerState extends State<PasajeroContainer> {
   }
 }
 
-class PasajeroHomePage extends StatelessWidget {
+class PasajeroHomePage extends StatefulWidget {
   const PasajeroHomePage({super.key});
+
+  @override
+  State<PasajeroHomePage> createState() => _PasajeroHomePageState();
+}
+
+class _PasajeroHomePageState extends State<PasajeroHomePage> {
+  final TextEditingController _destinoController = TextEditingController(text: 'CC Manila, Fusa');
+  bool _isForMe = true;
+  bool _isOutsideFusa = false;
+
+  @override
+  void dispose() {
+    _destinoController.dispose();
+    super.dispose();
+  }
+
+  void _buildGpsTrackingAndNavigate() {
+    // Simula una búsqueda precisa de GPS satelital con un modal de carga cyberpunk premium
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return _GpsLockingDialog(
+          onFinished: () {
+            Navigator.pop(context); // Cierra diálogo
+            Navigator.pushNamed(context, '/pasajero/tipo');
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,36 +106,48 @@ class PasajeroHomePage extends StatelessWidget {
           ),
         ),
 
-        // Barra superior
+        // Barra superior con LOGO
         Positioned(
-          top: 44, // Debajo de la barra de estado simulada
+          top: 44,
           left: 20,
           right: 20,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Logo
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                  ),
-                  children: [
-                    TextSpan(text: 'City', style: TextStyle(color: Colors.white)),
-                    TextSpan(
-                      text: 'MOTO',
-                      style: TextStyle(
-                        color: Color(0xFF8CFF00),
-                        shadows: [
-                          Shadow(color: Color(0xFF8CFF00), blurRadius: 8),
+              // Logotipo de la carpeta de assets
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/logos/logo3.jpeg',
+                  height: 38,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback a texto en caso de que falle la carga de la imagen
+                    return RichText(
+                      text: const TextSpan(
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                        ),
+                        children: [
+                          TextSpan(text: 'City', style: TextStyle(color: Colors.white)),
+                          TextSpan(
+                            text: 'MOTO',
+                            style: TextStyle(
+                              color: Color(0xFF8CFF00),
+                              shadows: [
+                                Shadow(color: Color(0xFF8CFF00), blurRadius: 8),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
+              
               // Notificaciones
               Container(
                 decoration: BoxDecoration(
@@ -129,17 +171,15 @@ class PasajeroHomePage extends StatelessWidget {
           ),
         ),
 
-        // Accesos directos flotantes rápidos
+        // Accesos directos flotantes rápidos (CITY Regalos / SOS)
         Positioned(
-          bottom: 180,
+          bottom: 385,
           left: 20,
           right: 20,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Botón CITY Regalos
               _buildFloatingActionButton(
-                context: context,
                 label: 'CITY Regalos',
                 icon: Icons.card_giftcard,
                 iconColor: const Color(0xFF8CFF00),
@@ -147,10 +187,7 @@ class PasajeroHomePage extends StatelessWidget {
                   Navigator.pushNamed(context, '/pasajero/regalos');
                 },
               ),
-              
-              // Botón SOS Emergencia
               _buildFloatingActionButton(
-                context: context,
                 label: 'SOS Emergencia',
                 icon: Icons.warning_amber_rounded,
                 iconColor: const Color(0xFFFF3B30),
@@ -163,7 +200,7 @@ class PasajeroHomePage extends StatelessWidget {
           ),
         ),
 
-        // Tarjeta inferior de Solicitud de Servicio
+        // Tarjeta inferior de Solicitud de Servicio (Expandida con campos requeridos)
         Positioned(
           bottom: 24,
           left: 20,
@@ -186,45 +223,116 @@ class PasajeroHomePage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Fila 1: Origen (GPS)
                 Row(
                   children: [
-                    const Icon(Icons.location_on, color: Color(0xFF8CFF00), size: 20),
+                    const Icon(Icons.my_location, color: Color(0xFF8CFF00), size: 16),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Ubicación actual',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 11,
-                              fontFamily: 'Inter',
-                            ),
+                            'Origen actual (GPS fijado)',
+                            style: TextStyle(color: Colors.white54, fontSize: 10, fontFamily: 'Inter'),
                           ),
-                          const SizedBox(height: 2),
                           Text(
-                            'Calle 85 # 11-32, Bogotá',
+                            _isOutsideFusa ? 'Vía Silvania (Fuera de Fusa)' : 'Calle 8 # 12-45, Fusagasugá Centro',
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Inter',
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
-                    Icon(Icons.edit, color: Colors.white.withOpacity(0.3), size: 16),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
+                
+                // Fila 2: Destino (TextField Interactivo)
+                TextField(
+                  controller: _destinoController,
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Inter'),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.location_on, color: Color(0xFFA855F7), size: 18),
+                    hintText: '¿A dónde vas?',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+                    filled: true,
+                    fillColor: const Color(0xFF0A0A0A),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF222222)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF222222)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF8CFF00)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Direcciones favoritas rápidas
+                Row(
+                  children: [
+                    _buildFavAddressBtn('🏠 Casa (Fusa)', 'Calle 6 # 14-22, Fusa Centro'),
+                    const SizedBox(width: 8),
+                    _buildFavAddressBtn('💼 Trabajo', 'Avenida Las Palmas # 20-30'),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Fila 3: Toggle ¿Para quién es el viaje?
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '¿Para quién es el servicio?',
+                      style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Inter'),
+                    ),
+                    Row(
+                      children: [
+                        _buildForWhoBtn('Para mí', _isForMe, () => setState(() => _isForMe = true)),
+                        const SizedBox(width: 8),
+                        _buildForWhoBtn('Para otro', !_isForMe, () => setState(() => _isForMe = false)),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Fila 4: Switch ¿Fuera de Fusa?
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '¿Estoy fuera de Fusagasugá?',
+                      style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Inter'),
+                    ),
+                    Switch(
+                      value: _isOutsideFusa,
+                      onChanged: (val) {
+                        setState(() {
+                          _isOutsideFusa = val;
+                        });
+                      },
+                      activeColor: const Color(0xFF8CFF00),
+                      activeTrackColor: const Color(0xFF8CFF00).withOpacity(0.3),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 
                 // Botón Pedir Servicio
                 Container(
-                  height: 56,
+                  height: 52,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     gradient: const LinearGradient(
@@ -239,9 +347,7 @@ class PasajeroHomePage extends StatelessWidget {
                     ],
                   ),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/pasajero/tipo');
-                    },
+                    onPressed: _buildGpsTrackingAndNavigate,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
@@ -256,13 +362,13 @@ class PasajeroHomePage extends StatelessWidget {
                           'Pedir servicio',
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Inter',
                           ),
                         ),
                         SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, color: Colors.black, size: 20),
+                        Icon(Icons.arrow_forward, color: Colors.black, size: 18),
                       ],
                     ),
                   ),
@@ -275,8 +381,57 @@ class PasajeroHomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildFavAddressBtn(String label, String address) {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _destinoController.text = address;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0A0A),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFF222222)),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Inter'),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForWhoBtn(String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF8CFF00).withOpacity(0.15) : const Color(0xFF0A0A0A),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF8CFF00) : const Color(0xFF222222),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF8CFF00) : Colors.white60,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Inter',
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFloatingActionButton({
-    required BuildContext context,
     required String label,
     required IconData icon,
     required Color iconColor,
@@ -317,6 +472,110 @@ class PasajeroHomePage extends StatelessWidget {
                 color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Dialogo de Calibración de GPS
+class _GpsLockingDialog extends StatefulWidget {
+  final VoidCallback onFinished;
+
+  const _GpsLockingDialog({required this.onFinished});
+
+  @override
+  State<_GpsLockingDialog> createState() => _GpsLockingDialogState();
+}
+
+class _GpsLockingDialogState extends State<_GpsLockingDialog> {
+  String _statusText = 'Optimizando señal satelital GPS...';
+  double _precision = 15.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCalibration();
+  }
+
+  void _startCalibration() async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (mounted) {
+      setState(() {
+        _statusText = 'Fijando coordenadas en tiempo real...';
+        _precision = 3.5;
+      });
+    }
+    await Future.delayed(const Duration(milliseconds: 700));
+    if (mounted) {
+      setState(() {
+        _statusText = 'Ubicación calibrada con precisión del 99%';
+        _precision = 0.9;
+      });
+    }
+    await Future.delayed(const Duration(milliseconds: 500));
+    widget.onFinished();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFF141414),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: Color(0xFF222222), width: 1.5),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Spinner de carga neón
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                const SizedBox(
+                  width: 64,
+                  height: 64,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8CFF00)),
+                  ),
+                ),
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0A0A0A),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.gps_fixed, color: Color(0xFF8CFF00), size: 24),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            
+            // Textos
+            Text(
+              _statusText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Rango de precisión: ${_precision}m',
+              style: TextStyle(
+                color: const Color(0xFF8CFF00).withOpacity(0.8),
+                fontSize: 11,
                 fontFamily: 'Inter',
               ),
             ),
@@ -413,7 +672,7 @@ class PasajeroHistorialPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8CFF00).withOpacity(0.1),
+                  color: const Color(0xFF8CFF00).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(

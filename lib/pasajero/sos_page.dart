@@ -112,7 +112,15 @@ class _SosPageState extends State<SosPage> with SingleTickerProviderStateMixin {
                         fontFamily: 'Inter',
                       ),
                     ),
-                    const SizedBox(width: 48), // Espaciador
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset(
+                        'assets/logos/logo3.jpeg',
+                        height: 24,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => const SizedBox(width: 24),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),

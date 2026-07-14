@@ -42,7 +42,7 @@ class CityMotoVIPApp extends StatelessWidget {
           error: Color(0xFFFF3B30),
         ),
         fontFamily: 'Inter',
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: const Color(0xFF141414),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

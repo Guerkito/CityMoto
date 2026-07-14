@@ -1,5 +1,46 @@
 import 'package:flutter/material.dart';
 import '../mock_data.dart';
+import '../widgets/bottom_nav.dart';
+
+class ConductorContainer extends StatefulWidget {
+  const ConductorContainer({super.key});
+
+  @override
+  State<ConductorContainer> createState() => _ConductorContainerState();
+}
+
+class _ConductorContainerState extends State<ConductorContainer> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: [
+                const ConductorHomePage(),
+                const ConductorHistorialPage(),
+                const ConductorPerfilPage(),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNav(
+        selectedIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
+    );
+  }
+}
 
 class ConductorHomePage extends StatefulWidget {
   const ConductorHomePage({super.key});
@@ -18,7 +59,6 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
     });
 
     if (_isActive) {
-      // Simula que llega una solicitud después de 3 segundos
       await Future.delayed(const Duration(seconds: 3));
       if (mounted && _isActive) {
         Navigator.pushNamed(context, '/conductor/solicitud').then((value) {
@@ -83,37 +123,28 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
-      appBar: AppBar(
-        title: const Text(
-          'Panel de Conductor',
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-        ),
-        backgroundColor: const Color(0xFF0A0A0A),
-        automaticallyImplyLeading: false,
-        elevation: 0,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fila superior: Perfil rápido y botón SOS Conductor
+              // Fila superior: Info rápida y botón SOS
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Container(
-                        width: 44,
-                        height: 44,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: const Color(0xFF222222),
                           border: Border.all(color: const Color(0xFFA855F7), width: 1.5),
                         ),
                         child: const Center(
-                          child: Icon(Icons.person, color: Colors.white, size: 20),
+                          child: Icon(Icons.person, color: Colors.white, size: 18),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -122,18 +153,18 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
                         children: [
                           Text(
                             driver.name,
-                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            driver.vehicle,
-                            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                            'Conductor Activo',
+                            style: TextStyle(color: const Color(0xFF8CFF00).withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ],
                   ),
                   
-                  // Botón SOS de pánico rápido para el conductor
+                  // Botón SOS de Pánico
                   GestureDetector(
                     onTap: _enviarAlertaConductor,
                     child: Container(
@@ -167,7 +198,7 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               
               // Estado Switch Card
               Container(
@@ -229,12 +260,12 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               
-              // Estadísticas de Hoy
+              // Estadísticas Rápidas
               const Text(
-                'Estadísticas de Hoy',
-                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                'Resumen Operativo hoy',
+                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 12),
               
@@ -247,99 +278,6 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
               ),
               const SizedBox(height: 12),
               _buildLargeStatItem('Ganancias Estimadas', '\$33.000 COP', Icons.monetization_on, const Color(0xFFA855F7)),
-              const SizedBox(height: 24),
-
-              // HISTORIAL DE VIAJES DEL CONDUCTOR
-              const Text(
-                'Historial de Viajes Recientes',
-                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-              ),
-              const SizedBox(height: 12),
-
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: MockData.viajesConductor.length,
-                itemBuilder: (context, index) {
-                  final v = MockData.viajesConductor[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF141414),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF222222)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              v.date,
-                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF8CFF00).withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'Completado',
-                                style: TextStyle(color: Color(0xFF8CFF00), fontSize: 9, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Cliente: ${v.passengerName}',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          v.route,
-                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Tarifa:', style: TextStyle(color: Colors.white60, fontSize: 11)),
-                            Text(
-                              v.fare,
-                              style: const TextStyle(color: Color(0xFF8CFF00), fontSize: 13, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Volver
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/');
-                  },
-                  child: Text(
-                    'Cambiar de Rol / Salir',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
-                      fontSize: 12,
-                      fontFamily: 'Inter',
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
             ],
           ),
         ),
@@ -410,6 +348,268 @@ class _ConductorHomePageState extends State<ConductorHomePage> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// PESTAÑA 1: HISTORIAL DE VIAJES DEL CONDUCTOR
+class ConductorHistorialPage extends StatelessWidget {
+  const ConductorHistorialPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
+      appBar: AppBar(
+        title: const Text('Historial de Servicios', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF141414),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: ListView.builder(
+          itemCount: MockData.viajesConductor.length,
+          itemBuilder: (context, index) {
+            final v = MockData.viajesConductor[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF141414),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF222222)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        v.date,
+                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8CFF00).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Completado',
+                          style: TextStyle(color: Color(0xFF8CFF00), fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF222222),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.person, color: Color(0xFFA855F7), size: 16),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              v.passengerName,
+                              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              v.route,
+                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        v.fare,
+                        style: const TextStyle(color: Color(0xFF8CFF00), fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// PESTAÑA 2: PERFIL DEL CONDUCTOR (Andrés M.)
+class ConductorPerfilPage extends StatelessWidget {
+  const ConductorPerfilPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final driver = MockData.drivers[MockData.activeDriverIndex];
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                'Mi Perfil de Chofer',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              ),
+              const SizedBox(height: 24),
+              
+              // Tarjeta Perfil Conductor
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF222222), width: 1.5),
+                ),
+                child: Row(
+                  children: [
+                    // Avatar con glow púrpura
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF222222),
+                        border: Border.all(color: const Color(0xFFA855F7), width: 2.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFA855F7).withOpacity(0.3),
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.person, color: Colors.white, size: 36),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            driver.name,
+                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Chofer VIP · 128 viajes completados',
+                            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12, fontFamily: 'Inter'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Opciones del Perfil
+              _buildOptionTile(
+                icon: Icons.motorcycle,
+                title: 'Información del Vehículo',
+                subtitle: '${driver.vehicle} · Placa ${driver.licensePlate}',
+                onTap: () {},
+              ),
+              _buildOptionTile(
+                icon: Icons.assignment_outlined,
+                title: 'Documentos de Conductor',
+                subtitle: 'SOAT y Licencia vigentes',
+                onTap: () {},
+              ),
+              _buildOptionTile(
+                icon: Icons.security,
+                title: 'Seguridad en Ruta (SOS)',
+                subtitle: 'Configurar botón de pánico de soporte',
+                onTap: () {},
+              ),
+              _buildOptionTile(
+                icon: Icons.help_outline,
+                title: 'Centro de Soporte y Ayuda',
+                subtitle: 'Contacto directo con la central',
+                onTap: () {},
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Botón de Desconexión (Cerrar sesión)
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                  },
+                  icon: const Icon(Icons.power_settings_new, color: Color(0xFFFF3B30), size: 18),
+                  label: const Text(
+                    'Desconectarse / Salir',
+                    style: TextStyle(
+                      color: Color(0xFFFF3B30),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFFF3B30), width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141414),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF222222), width: 1),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        leading: Icon(icon, color: Colors.white70, size: 22),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, fontFamily: 'Inter'),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 14),
       ),
     );
   }

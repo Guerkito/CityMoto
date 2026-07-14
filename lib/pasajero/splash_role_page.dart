@@ -171,7 +171,7 @@ class _SplashRolePageState extends State<SplashRolePage> {
                 iconData: Icons.shield, // Icono secundario
                 accentColor: const Color(0xFF8CFF00), // Verde neón
                 onTap: () {
-                  Navigator.pushNamed(context, '/pasajero');
+                  Navigator.pushNamed(context, '/login', arguments: 'pasajero');
                 },
               ),
               const SizedBox(height: 20),
@@ -184,7 +184,7 @@ class _SplashRolePageState extends State<SplashRolePage> {
                 iconData: Icons.monetization_on,
                 accentColor: const Color(0xFFA855F7), // Púrpura neón
                 onTap: () {
-                  Navigator.pushNamed(context, '/conductor');
+                  Navigator.pushNamed(context, '/login', arguments: 'conductor');
                 },
               ),
               

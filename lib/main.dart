@@ -11,6 +11,7 @@ import 'pasajero/en_curso_page.dart';
 import 'pasajero/finalizado_page.dart';
 import 'pasajero/regalos_page.dart';
 import 'pasajero/sos_page.dart';
+import 'pasajero/login_page.dart';
 
 import 'conductor/home_page.dart';
 import 'conductor/solicitud_page.dart';
@@ -71,6 +72,9 @@ class CityMotoVIPApp extends StatelessWidget {
           case '/':
             page = const SplashRolePage();
             break;
+          case '/login':
+            page = const LoginPage();
+            break;
           case '/pasajero':
             page = const PasajeroContainer();
             break;
@@ -98,7 +102,7 @@ class CityMotoVIPApp extends StatelessWidget {
 
           // --- RUTAS DE CONDUCTOR ---
           case '/conductor':
-            page = const ConductorHomePage();
+            page = const ConductorContainer();
             break;
           case '/conductor/solicitud':
             page = const SolicitudPage();
